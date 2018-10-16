@@ -1,0 +1,65 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Write your model definitions here
+ */
+
+ /**
+String: a UTF8 encoded String.
+Double: a double precision 64 bit numeric value.
+Integer: a 32 bit signed whole number.
+Long: a 64 bit signed whole number.
+DateTime: an ISO-8601 compatible time instance, with optional time zone and UTZ offset.
+Boolean: a Boolean value, either true or false.
+ */
+
+namespace org.szimano.merchantnetwork
+
+participant Person identified by personKey {
+  o String personKey
+  o String name
+  o Long szimanoCoinBalance
+}
+
+participant Merchant extends Person {
+}
+
+asset ArtToken identified by tokenKey {
+  o String tokenKey
+  o String tokenName
+  --> Person owner
+  --> ArtWork artWork
+}
+
+asset ArtWork identified by artWorkKey {
+  o String artWorkKey
+  o String description
+  --> Merchant merchant
+}
+
+transaction SendTokens {
+  --> ArtToken tokens
+  --> Person from
+  --> Person to
+  o Long amount
+  o Long pricePerToken
+}
+
+transaction ListArtWork {
+  o String tokenName
+  o Long tokenInitalBalance
+  o String artWorkDescription
+  --> Merchant owner
+}
