@@ -39,13 +39,13 @@ rule MerchantCanIssueOwnTokens {
   action: ALLOW
 }
 
-rule TokensAreReadable {
-  description:  "Everyone can read tokens"
-  participant: "**"
-  operation: ALL
-  resource: "**"
-  action: ALLOW
-}
+// rule TokensAreReadable {
+//   description:  "Everyone can read tokens"
+//   participant: "**"
+//   operation: ALL
+//   resource: "**"
+//   action: ALLOW
+// }
 
 
 rule SystemACL {
