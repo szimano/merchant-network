@@ -46,17 +46,18 @@ asset ArtToken identified by tokenKey {
 asset ArtWork identified by artWorkKey {
   o String artWorkKey
   o String description
-  --> Merchant merchant
+  --> Merchant owner
 }
 
 transaction SendTokens {
-  --> ArtToken tokens
+  --> ArtWork artWork
   --> Person from
   --> Person to
   o Long amount
   o Long pricePerToken
 }
 
+@returns(String)
 transaction ListArtWork {
   o String tokenName
   o Long tokenInitalBalance

@@ -184,6 +184,21 @@ describe('#' + namespace, () => {
         if (shouldRejectReason) {
             businessNetworkConnection.submitTransaction(transaction).should.be.rejectedWith(shouldRejectReason);    
         } else {
+            return await businessNetworkConnection.submitTransaction(transaction);       
+        } 
+    }
+
+    async function sendTokens(artWork, from, to, amount, price, shouldRejectReason = null) {
+        const transaction = factory.newTransaction(namespace, 'SendTokens');
+        transaction.artWork = factory.newRelationship(namespace, artWorkType, artWork);
+        transaction.from = factory.newRelationship(namespace, merchantType, from);
+        transaction.to = factory.newRelationship(namespace, personType, to);
+        transaction.amount = amount;
+        transaction.pricePerToken = price;
+
+        if (shouldRejectReason) {
+            businessNetworkConnection.submitTransaction(transaction).should.be.rejectedWith(shouldRejectReason);    
+        } else {
             await businessNetworkConnection.submitTransaction(transaction);       
         } 
     }
@@ -205,5 +220,28 @@ describe('#' + namespace, () => {
 
         let tokens = await artTokenRegistry.getAll();
         tokens.should.have.lengthOf(tokensToIssue);
+    });
+
+    it('Persons can send tokens', async () => {
+        // given
+        await useIdentity(merchantCardName);
+        const artWorkId = await listArtWork('merchant1', 'ART2', 100, 'Other Mona Lisa by Leonardo d. V.');
+
+        console.log(`Added artwork ${artWorkId}`);
+
+        const artTokenRegistry = await businessNetworkConnection.getAssetRegistry(artTokenNS);        
+        let tokens = await artTokenRegistry.getAll();
+
+        console.log(`Tokens! ${tokens.map(o => `Token owned by ${o.owner} for art ${o.artWork}\n`)}`);
+
+
+        // when
+        await sendTokens(artWorkId, 'merchant1', 'person1', 10, 2)
+
+        // then
+        const personRegistry = await businessNetworkConnection.getParticipantRegistry(personNS);     
+        
+        const aliceChanged = await personRegistry.get('person1');
+        aliceChanged.szimanoCoinBalance.should.equal(10000 - 2 * 10);
     });
 });

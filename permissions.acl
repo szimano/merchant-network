@@ -39,6 +39,15 @@ rule MerchantCanIssueOwnTokens {
   action: ALLOW
 }
 
+rule TokensAreReadable {
+  description:  "Everyone can read tokens"
+  participant: "**"
+  operation: ALL
+  resource: "**"
+  action: ALLOW
+}
+
+
 rule SystemACL {
   description:  "System ACL to permit all access"
   participant: "org.hyperledger.composer.system.Participant"
