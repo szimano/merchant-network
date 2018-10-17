@@ -191,20 +191,19 @@ describe('#' + namespace, () => {
     it('Merchant can list an artwork', async () => {
         // given
         await useIdentity(merchantCardName);
+        const tokensToIssue = 50;
 
         // when
-        const listedArtWork = await listArtWork('merchant1', 'ART', 1, 'Mona Lisa by Leonardo d. V.');
+        const listedArtWork = await listArtWork('merchant1', 'ART', tokensToIssue, 'Mona Lisa by Leonardo d. V.');
 
         // then
         const artTokenRegistry = await businessNetworkConnection.getAssetRegistry(artTokenNS);        
         const artWorkRegistry = await businessNetworkConnection.getAssetRegistry(artWorkNS);        
 
         let artWorks = await artWorkRegistry.getAll();
-        console.log(`ArtWorks ${artWorks}`);
         artWorks.should.have.lengthOf(1);
 
         let tokens = await artTokenRegistry.getAll();
-        console.log(`Tokens ${tokens}`);
-        tokens.should.have.lengthOf(50);
+        tokens.should.have.lengthOf(tokensToIssue);
     });
 });

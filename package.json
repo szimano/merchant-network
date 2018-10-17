@@ -8,7 +8,7 @@
   "scripts": {
     "prepublish": "mkdirp ./dist && composer archive create --sourceType dir --sourceName . -a ./dist/merchant-network.bna",
     "lint": "eslint .",
-    "test": "nyc mocha -t 0 test/*.js && cucumber-js"
+    "test": "nyc mocha -t 0 test/*.js"
   },
   "keywords": [
     "composer",

@@ -33,7 +33,7 @@ rule MerchantCanCRUDOwnArtWorks {
 rule MerchantCanIssueOwnTokens {
   description: "Merchant can list own works"
   participant(p): "org.szimano.merchantnetwork.Merchant"
-  operation: CREATE
+  operation: CREATE, READ
   resource(r): "org.szimano.merchantnetwork.ArtToken"
   condition: (r.artWork.merchant.getIdentifier() === p.getIdentifier())
   action: ALLOW
