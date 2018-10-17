@@ -26,26 +26,43 @@ rule MerchantCanCRUDOwnArtWorks {
   participant(p): "org.szimano.merchantnetwork.Merchant"
   operation: ALL
   resource(r): "org.szimano.merchantnetwork.ArtWork"
-  condition: (r.merchant.getIdentifier() === p.getIdentifier())
+  condition: (r.owner.getIdentifier() === p.getIdentifier())
   action: ALLOW
 }
 
 rule MerchantCanIssueOwnTokens {
-  description: "Merchant can list own works"
+  description: "Merchant can list tokens"
   participant(p): "org.szimano.merchantnetwork.Merchant"
   operation: CREATE, READ
   resource(r): "org.szimano.merchantnetwork.ArtToken"
-  condition: (r.artWork.merchant.getIdentifier() === p.getIdentifier())
+  condition: (r.artWork.owner.getIdentifier() === p.getIdentifier())
   action: ALLOW
 }
 
-// rule TokensAreReadable {
-//   description:  "Everyone can read tokens"
-//   participant: "**"
-//   operation: ALL
-//   resource: "**"
-//   action: ALLOW
-// }
+rule PersonsCanSendTokens {
+  description:  "Everyone can send tokens"
+  participant: "**"
+  operation: CREATE
+  resource: "org.szimano.merchantnetwork.SendTokens"
+  action: ALLOW
+}
+
+rule PersonsCanReadOthers {
+  description:  "Everyone can read others"
+  participant: "**"
+  operation: READ
+  resource: "org.szimano.merchantnetwork.Person"
+  action: ALLOW
+}
+
+//todo remove this
+rule TokensAreReadable {
+  description:  "Everyone can read tokens"
+  participant: "**"
+  operation: ALL
+  resource: "**"
+  action: ALLOW
+}
 
 
 rule SystemACL {
