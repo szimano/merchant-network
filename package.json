@@ -3,7 +3,7 @@
     "composer": "^0.20.2"
   },
   "name": "merchant-network",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Elite Merchant and Patron Group",
   "scripts": {
     "prepublish": "mkdirp ./dist && composer archive create --sourceType dir --sourceName . -a ./dist/merchant-network.bna",
