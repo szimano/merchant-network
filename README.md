@@ -4,6 +4,7 @@ Elite Merchant and Patron Group
 
 ## Run Rest Server
 
+* `composer network install --card PeerAdmin@hlfv1 --archiveFile networkadmin.card`
 * `composer archive create -t dir -n .`
 * `composer card import --file networkadmin.card`
 * `composer network install --card PeerAdmin@hlfv1 --archiveFile merchant-network@0.0.2.bna`
