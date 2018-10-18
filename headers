@@ -1,0 +1,26 @@
+/** 
+ * Send Tokens
+ * @param {org.szimano.merchantnetwork.SendTokens} tokens
+ * @transaction
+ */
+async function send(tokens) {
+    
+}
+
+/** 
+ * List ArtWork
+ * @param {org.szimano.merchantnetwork.ListArtWork} artWorkListing
+ * @returns {string} added artwork id
+ * @transaction
+ */
+async function list(artWorkListing) {
+}
+
+/** 
+ * Sell ArtWork
+ * @param {org.szimano.merchantnetwork.SellArtWork} sellArt
+ * @transaction
+ */
+async function sell(sellArt) {
+    
+}
