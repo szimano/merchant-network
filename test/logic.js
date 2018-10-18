@@ -187,19 +187,44 @@ describe('#' + namespace, () => {
         } 
     }
 
-    async function sendTokens(artWork, from, to, amount, price, shouldRejectReason = null) {
+    async function sendTokens(artWork, from, to, amount, shouldRejectReason = null) {
         const transaction = factory.newTransaction(namespace, 'SendTokens');
         transaction.artWork = factory.newRelationship(namespace, artWorkType, artWork);
         transaction.from = factory.newRelationship(namespace, merchantType, from);
         transaction.to = factory.newRelationship(namespace, personType, to);
         transaction.amount = amount;
-        transaction.pricePerToken = price;
 
         if (shouldRejectReason) {
             businessNetworkConnection.submitTransaction(transaction).should.be.rejectedWith(shouldRejectReason);    
         } else {
             await businessNetworkConnection.submitTransaction(transaction);       
         } 
+    }
+
+    async function sellArt(artWorkId, shouldRejectReason = null) {
+        const transaction = factory.newTransaction(namespace, 'SellArtWork');
+        transaction.artWork = factory.newRelationship(namespace, artWorkType, artWorkId);
+
+        if (shouldRejectReason) {
+            businessNetworkConnection.submitTransaction(transaction).should.be.rejectedWith(shouldRejectReason);    
+        } else {
+            await businessNetworkConnection.submitTransaction(transaction);       
+        } 
+    }
+
+    async function markAllTokensForSale(cardName, person, artWorkId) {
+        await useIdentity(cardName)
+
+        const personTokens = await businessNetworkConnection.query('selectTokensByOwnerAndArt', {
+            owner: `resource:org.szimano.merchantnetwork.Person#${person}`,
+            artWork: `resource:org.szimano.merchantnetwork.ArtWork#${artWorkId}`
+        });  
+
+        const saleTokens = personTokens.map((pt) => {pt.onSale = true; return pt});
+
+        const artTokenRegistry = await businessNetworkConnection.getAssetRegistry(artTokenNS);
+
+        await artTokenRegistry.updateAll(saleTokens);
     }
 
     it('Merchant can list an artwork', async () => {
@@ -230,7 +255,7 @@ describe('#' + namespace, () => {
         let tokens = await artTokenRegistry.getAll();
 
         // when
-        await sendTokens(artWorkId, 'merchant1', 'person1', 10, 2)
+        await sendTokens(artWorkId, 'merchant1', 'person1', 10)
 
         // then
         const personRegistry = await businessNetworkConnection.getParticipantRegistry(personNS);     
@@ -241,5 +266,39 @@ describe('#' + namespace, () => {
         });    
 
         aliceTokens.length.should.equal(10);
+    });
+
+    it('Merchant can sell art that is marked for sale in >= 50% of tokens', async () => {
+        // given
+        await useIdentity(merchantCardName);
+
+        const artWorkId = await listArtWork('merchant1', 'ART3', 100, 'Sixtine Chappel');
+
+        await sendTokens(artWorkId, 'merchant1', 'person1', 50);
+        await sendTokens(artWorkId, 'merchant1', 'person2', 50);
+
+        await markAllTokensForSale(aliceCardName, 'person1', artWorkId);
+
+        // expect
+        await useIdentity(merchantCardName);
+
+        await sellArt(artWorkId);
+    });
+
+    it('Merchant cannot sell art that is not marked for sale in >= 50% of tokens', async () => {
+        // given
+        await useIdentity(merchantCardName);
+
+        const artWorkId = await listArtWork('merchant1', 'ART3', 100, 'Sixtine Chappel');
+
+        await sendTokens(artWorkId, 'merchant1', 'person1', 20);
+        await sendTokens(artWorkId, 'merchant1', 'person2', 80);
+
+        await markAllTokensForSale(aliceCardName, 'person1', artWorkId);
+
+        // expect
+        await useIdentity(merchantCardName);
+
+        await sellArt(artWorkId, "There is no quorum (50%) for selling the art.");
     });
 });

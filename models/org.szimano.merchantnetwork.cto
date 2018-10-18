@@ -38,6 +38,7 @@ participant Merchant extends Person {
 asset ArtToken identified by tokenKey {
   o String tokenKey
   o String tokenName
+  o Boolean onSale
   --> Person owner
   --> ArtWork artWork
 }
@@ -53,7 +54,6 @@ transaction SendTokens {
   --> Person from
   --> Person to
   o Long amount
-  o Long pricePerToken
 }
 
 @returns(String)
@@ -62,4 +62,8 @@ transaction ListArtWork {
   o Long tokenInitalBalance
   o String artWorkDescription
   --> Merchant owner
+}
+
+transaction SellArtWork {
+  --> ArtWork artWork
 }

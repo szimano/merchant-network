@@ -39,6 +39,24 @@ rule MerchantCanIssueOwnTokens {
   action: ALLOW
 }
 
+rule MerchantCanSellArt {
+  description: "Merchant can sell own art"
+  participant(p): "org.szimano.merchantnetwork.Merchant"
+  operation: CREATE
+  resource(r): "org.szimano.merchantnetwork.SellArtWork"
+  condition: (r.artWork.owner.getIdentifier() === p.getIdentifier())
+  action: ALLOW
+}
+
+rule PersonCanIssueOwnTokens {
+  description: "Person can update own tokens"
+  participant(p): "org.szimano.merchantnetwork.Person"
+  operation: UPDATE
+  resource(r): "org.szimano.merchantnetwork.ArtToken"
+  condition: (r.owner.getIdentifier() === p.getIdentifier())
+  action: ALLOW
+}
+
 rule PersonsCanSendTokens {
   description:  "Everyone can send tokens"
   participant: "**"
@@ -52,6 +70,14 @@ rule PersonsCanReadOthers {
   participant: "**"
   operation: READ
   resource: "org.szimano.merchantnetwork.Person"
+  action: ALLOW
+}
+
+rule EveryoneCanReadTokens {
+  description:  "Everyone can read tokens"
+  participant: "**"
+  operation: READ
+  resource: "org.szimano.merchantnetwork.ArtToken"
   action: ALLOW
 }
 

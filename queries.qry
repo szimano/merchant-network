@@ -4,3 +4,10 @@ query selectTokensByOwnerAndArt {
     SELECT org.szimano.merchantnetwork.ArtToken
       WHERE (owner == _$owner AND artWork == _$artWork)
 }
+
+query selectTokensByArt {
+  description: "Select tokens belonging to given art"
+  statement:
+    SELECT org.szimano.merchantnetwork.ArtToken
+      WHERE (artWork == _$artWork)
+}
