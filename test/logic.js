@@ -35,6 +35,8 @@ const artTokenType = 'ArtToken';
 const artTokenNS = namespace + '.' + artTokenType;
 const artWorkType = 'ArtWork';
 const artWorkNS = namespace + '.' + artWorkType;
+const moneyTrasferType = 'MoneyTransfer';
+const moneyTransferNS = namespace + '.' + moneyTrasferType;
 
 describe('#' + namespace, () => {
     // In-memory card store for testing so cards are not persisted to the file system
@@ -132,23 +134,20 @@ describe('#' + namespace, () => {
         // Get the factory for the business network.
         factory = businessNetworkConnection.getBusinessNetwork().getFactory();
 
-        const driverRegistry = await businessNetworkConnection.getParticipantRegistry(personNS);
+        const personRegistry = await businessNetworkConnection.getParticipantRegistry(personNS);
         // Create the drivers.
         const alice = factory.newResource(namespace, personType, 'person1');
         alice.name = 'Alice';
-        alice.szimanoCoinBalance = 10000;
 
         const bob = factory.newResource(namespace, personType, 'person2');
         bob.name = 'Bob';
-        bob.szimanoCoinBalance = 20000;
 
-        driverRegistry.addAll([alice, bob]);
+        personRegistry.addAll([alice, bob]);
 
         const merchantRegistry = await businessNetworkConnection.getParticipantRegistry(merchantNS);
         // Create the assets.
         const merchant = factory.newResource(namespace, merchantType, 'merchant1');
         merchant.name = 'Merchant';
-        merchant.szimanoCoinBalance = 1000000;
 
         merchantRegistry.addAll([merchant]);
 
@@ -227,13 +226,8 @@ describe('#' + namespace, () => {
         await useIdentity(merchantCardName);
         const artWorkId = await listArtWork('merchant1', 'ART2', 100, 'Other Mona Lisa by Leonardo d. V.');
 
-        console.log(`Added artwork ${artWorkId}`);
-
         const artTokenRegistry = await businessNetworkConnection.getAssetRegistry(artTokenNS);        
         let tokens = await artTokenRegistry.getAll();
-
-        console.log(`Tokens! ${tokens.map(o => `Token owned by ${o.owner} for art ${o.artWork}\n`)}`);
-
 
         // when
         await sendTokens(artWorkId, 'merchant1', 'person1', 10, 2)
@@ -241,7 +235,11 @@ describe('#' + namespace, () => {
         // then
         const personRegistry = await businessNetworkConnection.getParticipantRegistry(personNS);     
         
-        const aliceChanged = await personRegistry.get('person1');
-        aliceChanged.szimanoCoinBalance.should.equal(10000 - 2 * 10);
+        const aliceTokens = await businessNetworkConnection.query('selectTokensByOwnerAndArt', {
+            owner: `resource:org.szimano.merchantnetwork.Person#person1`,
+            artWork: `resource:org.szimano.merchantnetwork.ArtWork#${artWorkId}`
+        });    
+
+        aliceTokens.length.should.equal(10);
     });
 });

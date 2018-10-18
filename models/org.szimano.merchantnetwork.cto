@@ -30,7 +30,6 @@ namespace org.szimano.merchantnetwork
 participant Person identified by personKey {
   o String personKey
   o String name
-  o Long szimanoCoinBalance
 }
 
 participant Merchant extends Person {
